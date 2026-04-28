@@ -29,21 +29,22 @@ CREATE ROLE role_staff;
 -- Customer role (read-only + own transactions)---------------------
 CREATE ROLE role_customer;
 
-/*----------------------------------------------GRANTING THE PERMISSIONS TO THE DIFFERENT USERS ACCORDING TO THEIR ROLES------------------*/
+/*----------------------------------------------GRANTING THE PERMISSIONS TO THE DIFFERENT ROLES-------------------------------------------*/
+-- Giving all permissions to the admin
 GRANT ALL PRIVILEGES ON ONLINEBANKING2.* TO role_admin;
 
-/*----------------------------------------------STAFF (Can operate transactions, but cannot delete logs)----------------------------------*/
+/*----------------------------------------------STAFF (Can operate transactions, but cannot delete logs and transactions_details)-----------*/
 -------------------- Read access
 GRANT SELECT ON ONLINEBANKING2.customers TO role_staff;
 GRANT SELECT ON ONLINEBANKING2.accounts_details TO role_staff;
+GRANT SELECT ON ONLINEBANKING2.Users_public_view TO role_staff;
+GRANT SELECT ON ONLINEBANKING2.user_customer_account_view TO role_staff;
+GRANT SELECT ON ONLINEBANKING2.customer_account_view TO role_staff;
 
 ------------------ Transaction operations
 GRANT EXECUTE ON PROCEDURE ONLINEBANKING2.deposit_amount TO role_staff;
 GRANT EXECUTE ON PROCEDURE ONLINEBANKING2.withdraw_amount TO role_staff;
 GRANT EXECUTE ON PROCEDURE ONLINEBANKING2.transfer_funds TO role_staff;
-
-------------------- View audit logs (read-only)
-GRANT SELECT ON ONLINEBANKING2.admin_audit_view TO role_staff;
 
 /*-----------------------------------------------CUSTOMERS (can only see their account_details , perform the transactions)----------------*/
 --------------------- Customer can only see their own data via views
@@ -68,6 +69,7 @@ GRANT role_customer TO 'customer_user'@'%';
 SET DEFAULT ROLE role_admin TO 'admin_user'@'%';
 SET DEFAULT ROLE role_staff TO 'staff_user'@'%';
 SET DEFAULT ROLE role_customer TO 'customer_user'@'%';
+
 
 /*-------------------------------------- TRIGGER FOR PREVENTING THE DELETE ON TRANSACTIONS DETAILS TABLE IF SOMEONE GETS THE PERMISSION---*/
 CREATE TRIGGER prevent_transaction_delete
